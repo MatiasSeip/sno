@@ -1,0 +1,572 @@
+@font-face {
+    font-family: "Gotham";
+    src: url("../fonts/Gotham-Medium.woff2") format("woff2");
+}
+
+@font-face {
+    font-family: "Publico";
+    src: url("../fonts/PublicoText-Roman.woff2") format("woff2");
+    font-weight: normal;
+}
+
+@font-face {
+    font-family: "Publico";
+    src: url("../fonts/PublicoText-Semibold.woff2") format("woff2");
+    font-weight: bold;
+}
+
+@font-face {
+    font-family: "Publico";
+    src: url("../fonts/PublicoText-Italic.woff2") format("woff2");
+    font-style: italic;
+}
+
+@font-face {
+    font-family: "WorkSans";
+    src: url("../fonts/WorkSans-Regular.woff2") format("woff2");
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: "WorkSans";
+    src: url("../fonts/WorkSans-Bold.woff2") format("woff2");
+    font-weight: bold;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: "WorkSans";
+    src: url("../fonts/WorkSans-Italic.woff2") format("woff2");
+    font-weight: normal;
+    font-style: italic;
+}
+
+@font-face {
+    font-family: "WorkSans";
+    src: url("../fonts/WorkSans-BoldItalic.woff2") format("woff2");
+    font-weight: bold;
+    font-style: italic;
+}
+
+html,
+body {
+    min-height: 100%;
+}
+
+body {
+    background-color: rgb(243, 244, 244);
+    font-size: 24px;
+    line-height: 36px;
+    color: #203e51;
+    font-family: "Publico", serif;
+    margin: 0;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.container {
+    display: grid;
+    flex: 1;
+    grid-template-columns: 1fr;
+    column-gap: 32px;
+    padding: 8px;
+    box-sizing: border-box;
+    align-content: start;
+}
+
+.venstre {
+    display: none;
+}
+
+.midt {
+    padding-top: 48px;
+    padding-left: 12px;
+    padding-right: 12px;
+    min-width: 0;
+}
+
+.høgre {
+    margin: 0;
+    padding-left: 12px;
+    padding-right: 12px;
+    min-width: 0;
+}
+
+.botn {
+    position: relative;
+    background-color: #56d3ed;
+    width: 100vw;
+    height: 150px;
+    flex-shrink: 0;
+    z-index: 2;
+
+    box-shadow: 0 0 0 100vmax #56d3ed;
+    box-shadow: 0 100vmax 0 100vmax #56d3ed;
+    clip-path: inset(0 -100vmax -100vmax);
+}
+
+p {
+    margin-top: 1em;
+    margin-bottom: 1em;
+}
+
+.sensur-token {
+    font-style: normal;
+}
+
+.sensur-bracket {
+    font-style: normal;
+    color: #56d3ed;
+}
+
+.sansserif {
+    font-family: "WorkSans", "Publico", sans-serif;
+    font-size: 20px;
+    margin-top: 0.5em;
+    margin-bottom: 0.5em;
+}
+
+.ogsåKjentSom {
+    font-family: "WorkSans", "Publico", sans-serif;
+    font-size: 20px;
+}
+
+input {
+    display: inline-block;
+    field-sizing: content;
+    max-width: 200vmax;
+    min-width: 450px;
+    border: none;
+    outline: none;
+    margin-top: 8px;
+    margin-bottom: 0;
+    margin-left: -5px;
+    text-indent: 5px;
+    padding: 0;
+    font-family: "Publico", serif;
+    font-size: 48px;
+    line-height: 1.2;
+    font-weight: bold;
+    color: #203e51;
+    background-color: transparent;
+}
+
+.rist {
+    animation: shake 0.3s ease-in-out;
+}
+
+@keyframes shake {
+    0% {
+        transform: translateX(0);
+    }
+    25% {
+        transform: translateX(-5px);
+    }
+    50% {
+        transform: translateX(5px);
+    }
+    75% {
+        transform: translateX(-5px);
+    }
+    100% {
+        transform: translateX(0);
+    }
+}
+
+input::placeholder {
+    color: #b5b5b5;
+}
+
+label {
+    margin: 0;
+    padding: 0;
+    gap: 0;
+    white-space: pre;
+    display: inline-block;
+    font-size: 48px;
+    font-weight: bold;
+    color: #b5b5b5;
+}
+
+.gjettefeltRad {
+    display: flex;
+    align-items: baseline;
+    flex-wrap: nowrap;
+    white-space: nowrap;
+    overflow: visible;
+    overflow-x: visible;
+}
+
+#gjettefelt {
+    flex: 0 0 auto;
+}
+
+#hint {
+    flex: 0 0 auto;
+    white-space: pre;
+}
+
+[hidden] {
+    display: none !important;
+}
+
+.fixedTable {
+    table-layout: fixed;
+    width: 250px;
+    margin-top: 8px;
+    margin-left: 16px;
+}
+
+.fixedTableBotn {
+    table-layout: fixed;
+    width: 187.5px;
+    margin-top: 34px;
+    margin-left: 12px;
+}
+
+td {
+    text-align: center;
+    font-family: "Gotham", monospace;
+    font-size: 36px;
+    line-height: 32px;
+    font-weight: normal;
+    opacity: 0.5;
+}
+
+button {
+    font-family: "WorkSans", "Publico", sans-serif;
+    font-size: 20px;
+    border-style: solid;
+    border-width: 2px;
+    border-color: #b5b5b5;
+    background-color: transparent;
+    color: #203e51;
+    padding: 3.5px 16px;
+    margin-top: 1em;
+    margin-bottom: 1em;
+}
+
+button:hover {
+    cursor: pointer;
+    text-decoration: underline;
+    text-decoration-thickness: 1.5px;
+}
+
+button:disabled {
+    color: #b5b5b5;
+    pointer-events: none;
+}
+
+#lesHeile {
+    font-family: "WorkSans", "Publico", sans-serif;
+    font-size: 20px;
+    border-style: solid;
+    border-width: 2px;
+    border-color: #b5b5b5;
+    background-color: transparent;
+    color: #203e51;
+    display: inline-block;
+    text-decoration: none;
+    padding: 0 16px;
+    margin-top: 0.5em;
+}
+
+#lesHeile:hover {
+    cursor: pointer;
+    text-decoration: underline;
+    text-decoration-thickness: 1.5px;
+}
+
+.toolTip {
+    position: relative;
+    display: block;
+    width: 100%;
+    font-family: "WorkSans", "Publico", sans-serif;
+    font-size: 20px;
+    margin-top: 0.5em;
+    margin-bottom: 0.5em;
+}
+
+.toolTipTrigger {
+    width: 15px;
+    height: 15px;
+    border: 1px solid;
+    border-color: #b5b5b5;
+    border-radius: 50%;
+    color: inherit;
+    cursor: pointer;
+    font-size: 15px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    margin: 0 0 0 -6px;
+    vertical-align: 10px;
+}
+
+.toolTipTrigger:hover {
+    text-decoration: none;
+    border-color: #203e51;
+}
+
+.toolTipBoks {
+    position: absolute;
+    top: calc(100% + 8px);
+    left: 0;
+    right: 0;
+    padding: 10px 12px;
+    background: white;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+    font-size: 15px;
+    line-height: 1.5;
+    z-index: 100;
+    display: none;
+}
+
+.toolTipBoks.is-visible {
+    display: block;
+}
+
+.popupToolTip {
+    display: inline-block;
+    position: relative;
+    white-space: nowrap;
+    vertical-align: baseline;
+}
+
+.popupToolTip .toolTipTrigger {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.popupBakgrunn {
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    background: rgba(32, 62, 81, 0.35);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+.popupBoks {
+    position: relative;
+    max-width: 520px;
+    width: min(100%, 520px);
+    background: rgb(243, 244, 244);
+    color: #203e51;
+    padding: 32px;
+    box-sizing: border-box;
+    box-shadow: 0 16px 48px rgba(0, 0, 0, 0.25);
+    border: none;
+}
+
+.popupBoks p {
+    margin-top: 0;
+    font-family: "WorkSans", "Publico", sans-serif;
+    font-size: 20px;
+}
+
+#popupTekst .popupToolTip {
+    display: inline-block !important;
+    position: relative;
+    width: auto !important;
+    max-width: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    vertical-align: baseline;
+    white-space: nowrap;
+    font-size: inherit;
+}
+
+#popupTekst .popupToolTip .toolTipTrigger {
+    display: inline-flex !important;
+    width: 15px !important;
+    height: 15px !important;
+    min-width: 15px !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    vertical-align: 8px;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+    font-size: 15px;
+}
+
+#popupTekst .popupToolTip .toolTipBoks {
+    position: fixed;
+    display: none;
+    width: 280px;
+    max-width: calc(100vw - 32px);
+    padding: 10px 12px;
+    white-space: normal;
+    z-index: 1200;
+    box-sizing: border-box;
+}
+
+#popupTekst .popupToolTip .toolTipBoks.is-visible {
+    display: block;
+}
+
+.popupLukk {
+    position: absolute;
+    top: 6px;
+    right: 14px;
+    border: none;
+    padding: 0;
+    margin: 0;
+    font-size: 32px;
+    line-height: 1;
+    color: #b5b5b5;
+}
+
+.popupLukk:hover {
+    text-decoration: none;
+}
+
+h1 {
+    font-family: "Gotham", sans-serif;
+    font-size: 39px;
+    line-height: 45px;
+    font-weight: normal;
+    margin-top: 16px;
+    margin-left: 16px;
+}
+
+h2 {
+    display: inline-block;
+    font-size: 48px;
+    line-height: 1.2;
+    font-weight: bold;
+    margin-top: 8px;
+    margin-bottom: 0;
+}
+
+@media (min-width: 1001px) {
+    .container {
+        grid-template-columns: 1.5fr 4fr 2fr;
+    }
+
+    .venstre {
+        display: block;
+    }
+
+    .midt {
+        padding-top: 135px;
+        padding-left: 0px;
+        padding-right: 0px;
+        position: relative;
+        overflow: visible;
+        z-index: 3;
+        min-width: 0;
+    }
+
+    .høgre {
+        padding-top: 239px;
+        padding-left: 24px;
+        padding-right: 16px;
+        position: relative;
+        min-width: 0;
+    }
+
+    .høgre::before {
+        content: "";
+        position: absolute;
+        z-index: 1;
+        left: -16px;
+        top: 250px;
+        height: var(--linje-lengde, 341px);
+        width: 2px;
+        background: #b5b5b5;
+    }
+
+    .sansserif {
+        margin-top: 1em;
+        margin-bottom: 1em;
+    }
+
+    .toolTip {
+        margin-top: 1em;
+        margin-bottom: 1em;
+    }
+
+    input {
+        margin-bottom: 0.83em;
+    }
+
+    h2 {
+        margin-bottom: 0.83em;
+    }
+
+    .fixedTableBotn {
+        display: none;
+    }
+}
+
+@media (max-width: 1000px) {
+    body {
+        font-size: 18px;
+        line-height: 27px;
+    }
+
+    h2,
+    input,
+    label {
+        font-size: 30px;
+    }
+
+    .sansserif,
+    .toolTip,
+    .ogsåKjentSom,
+    .popupBoks p,
+    button,
+    #lesHeile{
+        font-size: 15px;
+    }
+
+    td {
+        font-size: 27px;
+        line-height: 24px;
+    }
+
+    .toolTipTrigger {
+        width: 11.25px;
+        height: 11.25px;
+        font-size: 11.25px;
+        vertical-align: 7.5px;
+    }
+
+    .toolTipBoks {
+        font-size: 11.25px;
+    }
+
+    #popupTekst .popupToolTip .toolTipTrigger {
+        width: 11.25px !important;
+        height: 11.25px !important;
+        min-width: 11.25px !important;
+        font-size: 11.25px;
+        vertical-align: 6px;
+    }
+
+    #popupTekst .popupToolTip .toolTipBoks {
+        width: 240px;
+        max-width: calc(100vw - 48px);
+        right: -60px;
+        font-size: 11.25px;
+    }
+
+    .popupBoks {
+        padding: 24px;
+    }
+
+    .popupLukk {
+        top: 4.5px;
+        right: 10.5px;
+        font-size: 24px;
+    }
+}

@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+    <meta charset="UTF-8" />
+    <title>Store norske ordleik</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <main class="container">
+        <div class ="venstre">
+            <table class="fixedTable">
+                <tr><td>S</td><td>T</td><td style="opacity: 1;">O</td><td>R</td><td>E</td></tr>
+                <tr><td>N</td><td style="opacity: 1;">O</td><td style="opacity: 1;">R</td><td>S</td><td>K</td><td>E</td></tr>
+                <tr><td style="opacity: 1;">O</td><td style="opacity: 1;">R</td><td style="opacity: 1;">D</td><td>L</td><td>E</td><td>I</td><td>K</td></tr>
+            </table>
+        </div>
+        <div class ="midt">
+            <div class="gjettefeltRad">
+                <input type="text" id="gjettefelt" placeholder="Gjett oppslagsordet" autocomplete="off" autofocus>
+                <label for="gjettefelt" id="hint" hidden="true"></label>
+            </div>            
+            <h2 id="oppslagsord"></h2>
+            <p id="oks" class="ogsåKjentSom" hidden="true"><b>OGSÅ KJENT SOM</b></p>
+            <p id="ingress"></p>
+            <button id="skipKnapp" hidden>Hopp over ➔</button>
+            <p id="skrivenAv" class="sansserif" hidden="true">Skriven av:</p>
+            <div>
+                <a id="lesHeile" hidden="true" target="_blank" rel="noopener noreferrer">Les heile artikkelen i Store norske leksikon ➔</a>
+            </div>
+            <div>
+                <button id="tilfeldigArtikkel" hidden="true">Prøv igjen ⏎</button>
+            </div>
+        </div>
+        <div class ="høgre">
+            <p id="streak" class="sansserif">0 på rad</p>
+            <p id="besteStreak" class="sansserif">0 er rekorden din</p>
+            <p class="toolTip">
+                <span id="daglegStreak">0 lang dagleg sigersrekke</span>
+                <span id="daglegStatus"></span>
+                <button 
+                    class="toolTipTrigger" 
+                    type="button" 
+                    aria-label="Kva er dagleg sigersrekke?" 
+                    aria-expanded="false"
+                >
+                    ?
+                </button>
+                <span class="toolTipBoks" role="tooltip">
+                    For å halde på sigersrekka di må du kvar dag få fleire på rad enn sigersrekka er lang. Dette må du få til på første forsøk. Det vil seie at første dag må du få minst éin rett i dagens ordrekke, andre dag minst to rett og så vidare. Om du ikkje klarar dette, går sigersrekka ned att til null.<br>
+                    Den lengste daglege sigersrekka di nokosinne er <span id="besteDaglegeStreak">0</span>.
+                </span>
+            </p>
+            <p id="førsteGjett" class="sansserif" hidden="true"></p>
+            <p id="andreGjett" class="sansserif" hidden="true"></p>
+            <p id="tredjeGjett" class="sansserif" hidden="true"></p>
+            <p id="varsel" class="sansserif" hidden="true"></p>
+            <p id="nestenRett" class="sansserif" hidden="true">Ordet er nesten rett. Prøv ei anna staving.</p>
+            <p id="korrekt" class="sansserif" hidden="true"></p>
+            <p id="resultatDaglegStreak" class="sansserif" hidden="true"></p>
+            <p id="nyRekord" class="sansserif" hidden="true">Ny rekord!</p>
+        </div>
+    </main>
+    <div class ="botn">
+        <table class="fixedTableBotn">
+            <tr><td>S</td><td>T</td><td style="opacity: 1;">O</td><td>R</td><td>E</td></tr>
+            <tr><td>N</td><td style="opacity: 1;">O</td><td style="opacity: 1;">R</td><td>S</td><td>K</td><td>E</td></tr>
+            <tr><td style="opacity: 1;">O</td><td style="opacity: 1;">R</td><td style="opacity: 1;">D</td><td>L</td><td>E</td><td>I</td><td>K</td></tr>
+        </table>
+    </div>
+    <div id="tapPopup" class="popupBakgrunn" hidden>
+        <div class="popupBoks" role="dialog" aria-modal="true" aria-labelledby="tapPopupTittel">
+            <button id="lukkTapPopup" class="popupLukk" type="button" aria-label="Lukk">×</button>
+            <p id="popupTekst">
+                Du tapte. Klarar du betre?
+            </p>
+        </div>
+    </div>
+    <script type="module" src="script.js"></script>
+</body>
+</html>
