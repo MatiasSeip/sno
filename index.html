@@ -2,6 +2,7 @@
 <html lang="no">
 <head>
     <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Store norske ordleik</title>
     <link rel="stylesheet" href="css/style.css">
 </head>
@@ -16,12 +17,14 @@
         </div>
         <div class ="midt">
             <div class="gjettefeltRad">
-                <input type="text" id="gjettefelt" placeholder="Gjett oppslagsordet" autocomplete="off" autofocus>
+                <span class="tekstMålar" aria-hidden="true"></span>
+                <textarea id="gjettefelt" rows="1" placeholder="Gjett oppslagsordet" autocomplete="off" autofocus></textarea>
                 <label for="gjettefelt" id="hint" hidden="true"></label>
             </div>            
             <h2 id="oppslagsord"></h2>
             <p id="oks" class="ogsåKjentSom" hidden="true"><b>OGSÅ KJENT SOM</b></p>
             <p id="ingress"></p>
+            <button id="mobilSendKnapp" type="button" hidden>Gjett ⏎</button>
             <button id="skipKnapp" hidden>Hopp over ➔</button>
             <p id="skrivenAv" class="sansserif" hidden="true">Skriven av:</p>
             <div>

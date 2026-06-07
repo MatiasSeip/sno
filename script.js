@@ -8,6 +8,14 @@ let artikkelData = null;
 let ingressTemplateHTMLRaw = "";
 let ingressTemplateDecorated = "";
 let ingressMeta = [];
+const litenFeilLyd = new Audio("./lydar/feil1.wav")
+const storFeilLyd = new Audio("./lydar/feil2.wav")
+const vinnLyd = new Audio("./lydar/rett.wav")
+
+for (const lyd of [litenFeilLyd, storFeilLyd, vinnLyd]){
+    lyd.preload = "auto";
+    lyd.volume = 0.5;
+}
 
 async function fetchArtikkel(sensurert = true){
     if (sensurert && fullArtikkelTekstSensurert) return fullArtikkelTekstSensurert;
@@ -74,6 +82,14 @@ function visTapPopup(opnaMedTast = false) {
 function lukkTapPopup() {
     document.getElementById("tapPopup").hidden = true;
     tapPopupKanLukkastMedTast = false;
+}
+
+function spelLyd(lyd){
+    if (erMobil()) return;
+    lyd.pause();
+    lyd.currentTime = 0;
+    lyd.play().catch(() => {
+    });
 }
 
 function vaskArtikkelnamn(artikkelnamn){
@@ -950,6 +966,19 @@ function sensurerArtikkeltekst(tekst, artikkelnamn, ogsåKjentSomListe = []){
         return chosen;
     }
 
+    function erKortTittelStemMedKortEnding(stem, ending, stemType) { //berre sensurer ved eksakt treff, eller når endinga er lengre enn to bokstavar
+        const erTittelStem =
+            stemType === "normalStamme" ||
+            stemType === "delAvTittel" ||
+            stemType === "delAvTittelOgForenkla";
+
+        if (!erTittelStem) return false;
+
+        const stemKort = fjernBindestrek(stem);
+
+        return stemKort.length <= 2 && ending && ending.length <= 2; //minst tre lang stem eller tre lang ending
+    }
+
     normalTekst.replace(regex, (full, stem, ending = "", rest = "", offset, whole) => {
         
         const stemType = STEM_INFO.get(stem.toLowerCase());
@@ -976,6 +1005,10 @@ function sensurerArtikkeltekst(tekst, artikkelnamn, ogsåKjentSomListe = []){
         const teiknFøre = offset > 0 ? whole[offset - 1] : "";
         const erFøre = /[a-zæøå]/i.test(teiknFøre);
         const erEtter = Boolean(rest);
+
+        if (erKortTittelStemMedKortEnding(stem, ending, stemType)) {
+            return;
+        }
 
         if (stem.length < 4 && (erFøre || erEtter)) { //unngå å tru at korte stammer er del av samansette ord
             return;
@@ -1317,7 +1350,7 @@ function bytArtikkel(forsøk = 0){ //tilfeldig artikkel etter seed
 
 function skalHoppeOverOrd(artikkelnamn) {
     const tittel = vaskArtikkelnamn(artikkelnamn);
-    return /\bi Norge\b|\bNorges\b|historie/.test(tittel); //historie trigger også om det er del av samansett
+    return /\bi Norge\b|\bi Noreg\b|\bNorges\b|historie/.test(tittel); //historie trigger også om det er del av samansett
 }
 
 function skalHoppeOverLangTittel(artikkelnamn) {
@@ -1819,7 +1852,7 @@ async function prøvHoppOver(opnaMedTast = false){
         await nyArtikkel();
     } else {
         vellykkaSkips = 0;
-        await feilGjett("Klarte ikkje å hoppe over");
+        await feilGjett("Klarte ikkje å hoppe over", opnaMedTast, true);
         await visResultat(false, "", opnaMedTast);
     }
 }
@@ -1901,16 +1934,23 @@ async function visResultat(suksess = false, gjettaOKS = "", popupOpnaMedTast = f
     ferdigGjetta = true;
 }
 
-async function feilGjett(gjett, opnaMedTast = false){
+async function feilGjett(gjett, opnaMedTast = false, prøvdeHoppe = false){
     const tekst = await fetchArtikkel();
     runde = runde + 1;
     oppdaterSkipKnapp();
     gjettefelt.value = "";
+    nullstillHøgde();
+    mobilSendKnapp.hidden = true;
     if (runde < 4){ //fleire gjett att
         ingressMeta = await byggOrdgrense();
         ingressTemplateHTMLRaw = visSetningar(tekst, runde); //lagre før dekorasjon
         ingressTemplateDecorated = dekorerSensur(ingressTemplateHTMLRaw, ingressMeta);
         ingress.innerHTML = ingressTemplateDecorated;
+        if (prøvdeHoppe){
+            spelLyd(storFeilLyd);
+        } else{
+            spelLyd(litenFeilLyd);
+        }        
         if (runde === 2){ //vis første gjett
             document.getElementById("førsteGjett").textContent = gjett + " ✕";
             document.getElementById("førsteGjett").hidden = false;
@@ -1919,20 +1959,24 @@ async function feilGjett(gjett, opnaMedTast = false){
             document.getElementById("andreGjett").hidden = false;
             document.getElementById("varsel").textContent = "Eitt forsøk att!";
             document.getElementById("varsel").hidden = false;
-            gjettefelt.placeholder = "Hint: " + hintOmForbokstav(vaskArtikkelnamn(artikkelnamn));
+            oppdaterPlaceholder();
         }
     } else{ //tap
         document.getElementById("tredjeGjett").textContent = gjett + " ✕"; //vis siste gjett
         document.getElementById("tredjeGjett").hidden = false;
         vellykkaSkips = 0;
         visResultat(false, "", opnaMedTast);
+        spelLyd(storFeilLyd);
     }
 }
 
 async function rettGjett(gjettaOKS){
     gjettefelt.value = "";
+    nullstillHøgde();
+    mobilSendKnapp.hidden = true;
     gjettaNesten = false;
     visResultat(true, gjettaOKS);
+    spelLyd(vinnLyd);
 }
 
 let hentarNyArtikkel = false; //så den ikkje skal fyre av dobbelt
@@ -1947,6 +1991,10 @@ async function nyArtikkel(){
         }
         ferdigGjetta = false;
         runde = 1;
+        brukarHarTryktIGjettefelt = false;
+        gjettefelt.value = "";
+        nullstillHøgde();
+        oppdaterPlaceholder();
         document.getElementById("resultatDaglegStreak").hidden = true;
         fullArtikkelTekstSensurert = null;
         fullArtikkelTekstUsensurert = null;
@@ -1956,14 +2004,17 @@ async function nyArtikkel(){
         ingressTemplateDecorated = dekorerSensur(ingressTemplateHTMLRaw, ingressMeta);
         ingress.innerHTML = ingressTemplateDecorated;
         oppslagsord.hidden = true;
-        gjettefelt.placeholder = "Gjett oppslagsordet";
+        mobilSendKnapp.hidden = true;
         gjettefelt.style.width = "";
         gjettefelt.hidden = false;
         document.getElementById("oks").hidden = true;
         document.getElementById("tilfeldigArtikkel").hidden = true;
         document.getElementById("skrivenAv").hidden = true;
         document.getElementById("lesHeile").hidden = true;
-        gjettefelt.focus();
+        if (!erMobil()){
+            gjettefelt.focus();
+        }
+        oppdaterPlaceholder();
         document.getElementById("førsteGjett").hidden = true;
         document.getElementById("andreGjett").hidden = true;
         document.getElementById("tredjeGjett").hidden = true;
@@ -1986,7 +2037,11 @@ document.getElementById("lesHeile") //for at ein skal kunne trykke enter etter �
         document.getElementById("tilfeldigArtikkel").focus();        
     });
 
-window.addEventListener('click', function() {
+window.addEventListener('click', function(event) {
+    if (erMobil()) return;
+
+    if (event.target.closest("button, a, input, textarea, select")) return;
+
     gjettefelt.focus();
 });
 
@@ -1996,9 +2051,60 @@ document.getElementById("tilfeldigArtikkel")
     });
 
 const gjettefelt = document.getElementById("gjettefelt");
+const mobilQuery = window.matchMedia("(max-width: 1000px)");
+const touchQuery = window.matchMedia("(pointer: coarse), (hover: none)"); //touchskjerm
 
-gjettefelt.addEventListener("blur", async () => {
+function erMobil() {
+    return mobilQuery.matches && touchQuery.matches;
+}
 
+let brukarHarTryktIGjettefelt = false;
+
+function oppdaterPlaceholder() {
+    if (runde === 3){
+        gjettefelt.placeholder = "Hint: " + hintOmForbokstav(vaskArtikkelnamn(artikkelnamn));
+        return;
+    }
+
+    if (!erMobil()){
+        gjettefelt.placeholder = "Gjett oppslagsordet";
+        return;
+    }
+
+    if (!brukarHarTryktIGjettefelt && gjettefelt.value.trim() === ""){
+        gjettefelt.placeholder = "Klikk her for å gjette";
+        return;
+    }
+
+    gjettefelt.placeholder = "Gjett oppslagsordet";
+}
+
+gjettefelt.addEventListener("pointerdown", () => {
+    if (erMobil()) {
+        brukarHarTryktIGjettefelt = true;
+        oppdaterPlaceholder();
+    }
+});
+
+gjettefelt.addEventListener("focus", () => {
+    if (!erMobil()) {
+        oppdaterPlaceholder();
+    }
+});
+
+gjettefelt.addEventListener("blur", () => {
+    if (erMobil() && gjettefelt.value.trim() === "") {
+        brukarHarTryktIGjettefelt = false;
+    }
+
+    oppdaterPlaceholder();
+});
+
+gjettefelt.addEventListener("input", oppdaterPlaceholder);
+mobilQuery.addEventListener("change", oppdaterPlaceholder);
+touchQuery.addEventListener("change", oppdaterPlaceholder);
+
+gjettefelt.addEventListener("blur", async () => {    
     if (erTabTrykt){
         erTabTrykt = false;
         return;
@@ -2006,6 +2112,73 @@ gjettefelt.addEventListener("blur", async () => {
 
     gjettefelt.focus();
     });
+
+const tekstMålar = document.createElement("span")
+tekstMålar.className = "tekstMålar";
+document.body.appendChild(tekstMålar);
+
+function nullstillHøgde(){
+    const lineHeight = parseFloat(getComputedStyle(gjettefelt).lineHeight);
+    gjettefelt.style.height = lineHeight + "px";
+    gjettefelt.style.width = "100%";
+}
+
+function målTekstbreidde(tekst){
+    tekstMålar.textContent = tekst || " ";
+    return tekstMålar.getBoundingClientRect().width;
+}
+
+function gjerTextareaBreiddeTilTekst(el){
+    const måltBreidde = målTekstbreidde(el.value);
+    const parentBreidde = el.parentElement.getBoundingClientRect().width;
+
+    el.style.width = Math.min(måltBreidde + 5, parentBreidde) + "px";
+}
+
+function textareaHarFleireLinjer(el){
+    const linjeHøgde = parseFloat(getComputedStyle(el).lineHeight);
+    return el.scrollHeight > linjeHøgde * 1.5;
+}
+
+function autoVeksTextarea(el){
+    el.style.height = "auto";
+    el.style.height = el.scrollHeight + "px";
+}
+
+function tekstVilWrappe(el){
+    const style = getComputedStyle(el);
+
+    const paddingX =
+        parseFloat(style.paddingLeft) +
+        parseFloat(style.paddingRight);
+
+    const usableWidth = el.clientWidth - paddingX;
+
+    if (el.value.includes("\n")) return true; // Om brukaren limer inn linjeskift, må feltet kunne vekse
+
+    return målTekstbreidde(el.value) > usableWidth;
+}
+
+function autoVeksTextareaBerreVedWrap(el){ //for å unngå små forskjellar mellom målt eilinjeshøgde og tomt felt
+    const lineHeight = parseFloat(getComputedStyle(el).lineHeight);
+
+    if (tekstVilWrappe(el)){
+        autoVeksTextarea(el);
+    } else{
+        el.style.height = lineHeight + "px";
+    }
+}
+
+function hintFårPlassPåSameLinje(textarea, hintText) {
+    const rad = textarea.parentElement;
+
+    const typedWidth = målTekstbreidde(textarea.value);
+    const hintWidth = målTekstbreidde(hintText);
+
+    const availableWidth = rad.getBoundingClientRect().width;
+
+    return typedWidth + hintWidth + 8 <= availableWidth;
+}
 
 gjettefelt.addEventListener("input", (event) => {
     let value = event.target.value;
@@ -2016,32 +2189,38 @@ gjettefelt.addEventListener("input", (event) => {
     event.target.value = value;
 
     if (runde === 3 && value !== ""){
-        gjettefelt.style.width = "";
-        gjettefelt.style.minWidth = 0;
-        gjettefelt.style.fieldSizing = "content"; //gjer sånn at hintet kjem rett bak teksten
-        document.getElementById("hint").textContent = dynamiskHint(vaskArtikkelnamn(artikkelnamn), value);
-        document.getElementById("hint").hidden = false;
+        const hintTekst = dynamiskHint(vaskArtikkelnamn(artikkelnamn), value);
+
+        gjerTextareaBreiddeTilTekst(gjettefelt); //gjer slik at hintet kjem rett bak
+        autoVeksTextareaBerreVedWrap(gjettefelt);
+
+        const harFleireLinjer = textareaHarFleireLinjer(gjettefelt);
+        const hintHarPlass = hintFårPlassPåSameLinje(gjettefelt, hintTekst);
+
+        if (harFleireLinjer || !hintHarPlass){
+            document.getElementById("hint").hidden = true;
+        } else{
+            document.getElementById("hint").textContent = hintTekst
+            document.getElementById("hint").hidden = false;
+        }
     } else{
         document.getElementById("hint").hidden = true;
-        gjettefelt.style.minWidth = "450px";
-        gjettefelt.style.width = value.length * 50 + "px"; //gjer sånn at f ikkje blir avkutta. 50 er ish breidda til W
+        gjettefelt.style.width = "100%";
+        autoVeksTextareaBerreVedWrap(gjettefelt);
     }
 
     ingress.innerHTML = fyllInnSensurDekorert(ingressTemplateDecorated, value); //oppdater sensuren med det som skrivast (dekorert)
+
+    mobilSendKnapp.hidden = !(erMobil() && value.trim() !== ""); //vis enterknapp om ikkje på mobil og noko i feltet
 });
 
 let gjettaNesten = false;
 
 let erTabTrykt = false;
 
-gjettefelt.addEventListener("keydown", (event) => { //gjett (via enter) eller trykk tab for å komme seg ut
+const mobilSendKnapp = document.getElementById("mobilSendKnapp");
 
-    if (event.key === 'Tab'){
-        erTabTrykt = true;
-    }
-
-    if (event.key !== "Enter") return;
-
+async function sendGjett(opnaMedTast = false){
     const gjettOriginal = gjettefelt.value.trim().toLowerCase();
     const gjett = normaliserTilNorskEkvivalent(gjettOriginal);
     const gjettSamantrekt = gjett.replace(/-/g, ""); //variant der bindestrekord er trekt saman
@@ -2144,6 +2323,25 @@ gjettefelt.addEventListener("keydown", (event) => { //gjett (via enter) eller tr
     gjettaNesten = false;
 
     feilGjett(gjettefelt.value, true); //om ingen av dei over -> feil gjett
+}
+
+
+gjettefelt.addEventListener("keydown", async (event) => { //gjett (via enter) eller trykk tab for å komme seg ut
+
+    if (event.key === 'Tab'){
+        erTabTrykt = true;
+    }
+
+    if (event.key !== "Enter") return;
+
+    event.preventDefault();
+    await sendGjett(true);
+});
+
+mobilSendKnapp.addEventListener("click", async (event) => {
+    event.stopPropagation();
+    await sendGjett(false);
+    gjettefelt.focus();
 });
 
 document.addEventListener("keydown", async (event) =>{ //enter key når ein har gjetta ferdig
@@ -2298,4 +2496,5 @@ window.addEventListener("scroll", oppdaterLinje, { passive: true });
 oppdaterLinje();
 oppdaterStreak()
 initDaglegStreak();
+oppdaterPlaceholder();
 nyArtikkel();
