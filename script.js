@@ -71,6 +71,7 @@ function visOgsåKjentSom(html = ""){
 }
 
 let tapPopupKanLukkastMedTast = false;
+let viserResultat = false;
 
 function visTapPopup(opnaMedTast = false) {
     const popup = document.getElementById("tapPopup");
@@ -1865,6 +1866,11 @@ function daglegStreakTooltipHTML() {
 }
 
 async function visResultat(suksess = false, gjettaOKS = "", popupOpnaMedTast = false){
+    viserResultat = true;
+    gjettefelt.disabled = true;
+    gjettefelt.blur();
+    gjettefelt. value = "";
+    nullstillHøgde();
     const streakFørResultat = streak;
     const rekordFørRun = besteStreakFørRun;
     const sloRekord = streakFørResultat > rekordFørRun;
@@ -1986,14 +1992,16 @@ async function nyArtikkel(){
     hentarNyArtikkel = true;
 
     try {
-        if (streak === 0) {
-            besteStreakFørRun = besteStreak;
-        }
+        viserResultat = false;
         ferdigGjetta = false;
         runde = 1;
         brukarHarTryktIGjettefelt = false;
+        gjettefelt.disabled = false;
         gjettefelt.value = "";
         nullstillHøgde();
+        if (streak === 0) {
+            besteStreakFørRun = besteStreak;
+        }
         oppdaterPlaceholder();
         document.getElementById("resultatDaglegStreak").hidden = true;
         fullArtikkelTekstSensurert = null;
@@ -2104,7 +2112,9 @@ gjettefelt.addEventListener("input", oppdaterPlaceholder);
 mobilQuery.addEventListener("change", oppdaterPlaceholder);
 touchQuery.addEventListener("change", oppdaterPlaceholder);
 
-gjettefelt.addEventListener("blur", async () => {    
+gjettefelt.addEventListener("blur", async () => {   
+    if (viserResultat || gjettefelt.hidden || gjettefelt.disabled) return;
+    
     if (erTabTrykt){
         erTabTrykt = false;
         return;
@@ -2181,6 +2191,11 @@ function hintFårPlassPåSameLinje(textarea, hintText) {
 }
 
 gjettefelt.addEventListener("input", (event) => {
+    if (viserResultat || gjettefelt.disabled || gjettefelt.hidden){
+        event.target.value = "";
+        return;
+    }
+
     let value = event.target.value;
 
     value = value.trimStart(); //kan ikkje starte med mellomrom
@@ -2221,6 +2236,8 @@ let erTabTrykt = false;
 const mobilSendKnapp = document.getElementById("mobilSendKnapp");
 
 async function sendGjett(opnaMedTast = false){
+    if (viserResultat || gjettefelt.disabled || gjettefelt.hidden) return;
+
     const gjettOriginal = gjettefelt.value.trim().toLowerCase();
     const gjett = normaliserTilNorskEkvivalent(gjettOriginal);
     const gjettSamantrekt = gjett.replace(/-/g, ""); //variant der bindestrekord er trekt saman
@@ -2335,6 +2352,9 @@ gjettefelt.addEventListener("keydown", async (event) => { //gjett (via enter) el
     if (event.key !== "Enter") return;
 
     event.preventDefault();
+
+    if (viserResultat || gjettefelt.disabled || gjettefelt.hidden) return;
+
     await sendGjett(true);
 });
 
